@@ -12,6 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+# Learn how to create the pretraining data for bert model
 """Create masked LM/next sentence masked_lm TF examples for BERT."""
 
 from __future__ import absolute_import
@@ -65,8 +67,16 @@ flags.DEFINE_float(
     "maximum length.")
 
 
+# Create a training example
 class TrainingInstance(object):
   """A single training instance (sentence pair)."""
+  # Initilization
+  # Input:
+  # tokens: list of tokens
+  # segment_ids: list of {0,1}.
+  # masked_lm_positions: list of integers for positions
+  # masked_lm_labels: list of tokens as labels
+  # is_random_next: either 0 or 1
 
   def __init__(self, tokens, segment_ids, masked_lm_positions, masked_lm_labels,
                is_random_next):
@@ -92,7 +102,12 @@ class TrainingInstance(object):
   def __repr__(self):
     return self.__str__()
 
-
+# write instance to examples
+# instances: List of instances with tokens, segment_ids, is_random_next, masked_lm_positions/labels
+# tokenizer:
+# max_seq_lenth:
+# max_predictions_per_seq:
+# output_files:
 def write_instance_to_example_files(instances, tokenizer, max_seq_length,
                                     max_predictions_per_seq, output_files):
   """Create TF example files from `TrainingInstance`s."""
@@ -175,7 +190,16 @@ def create_float_feature(values):
   feature = tf.train.Feature(float_list=tf.train.FloatList(value=list(values)))
   return feature
 
-
+# create instances
+# Input:
+# input_files:
+# tokenizer:
+# max_seq_length:
+# dupe_factor:
+# short_seq_prob:
+# masked_lm_prob:
+# max_predictions_per_seq
+# rng:
 def create_training_instances(input_files, tokenizer, max_seq_length,
                               dupe_factor, short_seq_prob, masked_lm_prob,
                               max_predictions_per_seq, rng):
@@ -414,7 +438,8 @@ def create_masked_lm_predictions(tokens, masked_lm_prob,
 
   return (output_tokens, masked_lm_positions, masked_lm_labels)
 
-
+# truncate the tokens_a if len(tokens_a)>len(tokens_b), otherwise, truncate tokens_b
+# truncate either front or end.
 def truncate_seq_pair(tokens_a, tokens_b, max_num_tokens, rng):
   """Truncates a pair of sequences to a maximum sequence length."""
   while True:
